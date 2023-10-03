@@ -17,7 +17,9 @@
       <div class="right2"></div>
     </div>
   </div>
+  <div class="test">
 
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -36,6 +38,11 @@ console.log(a)
 @colorGreen: #42b983;
 @colorYellow: #e8ef21;
 @colorLogo: #fcece0;
+.test{
+  width: 100%;
+  background-color: pink;
+  height: 10000px;
+}
 .loading_mask{
   position: fixed;
   left: 0;

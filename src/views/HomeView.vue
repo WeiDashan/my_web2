@@ -52,20 +52,6 @@
             </div>
           </div>
         </div>
-
-      <div class="projectItem" v-for="item in proj" :key="item">
-        <div class="img">
-          <img class="lazyImg" alt="" :data-src="item.img" src="">
-        </div>
-        <div class="proj_info">
-          <div class="proj_title">
-            {{item.name}}
-          </div>
-          <div class="proj_desc">
-            {{item.desc}}
-          </div>
-        </div>
-      </div>
     </div>
     <div class="tools">
       <div class="tools_item" @click="toTop">
@@ -110,7 +96,8 @@
   width: 100%;
   height: 100%;
   display: flex;
-  //background-color: gold;
+  z-index: 99;
+  background-color: #ffffff;
   .loading{
     position: absolute;
     left: 50%;
@@ -469,6 +456,7 @@
   }
 }
 .home{
+  width: 100%;
   .mark{
     width: 100%;
     height: 100%;
@@ -482,6 +470,8 @@
   .background{
     margin: 0;
     padding: 0;
+    width: 100%;
+    overflow: hidden;
     img{
       display: block;
     }
@@ -501,6 +491,7 @@
     left: -3px;
     top: -3px;
     width: 6px;
+    display: none;
     height: 6px;
     border-radius: 50%;
     background-color: var(--theme-pointer_background);
@@ -514,6 +505,7 @@
     top: -10px;
     width: 20px;
     height: 20px;
+    display: none;
     border-radius: 5px;
     border: 1px var(--theme-pointer_border_color) solid;
     background-color: rgba(0,0,0,0);
@@ -577,7 +569,6 @@
     color: var(--theme-color);
     padding-top: 20px;
     padding-bottom: 20px;
-
     .projectItem{
       width: 100%;
       //height: 235px;
@@ -840,7 +831,14 @@
 }
 </style>
 <script setup lang="ts">
-import {onBeforeMount, onMounted, ref} from "vue"
+import {onMounted, ref} from "vue"
+const isMobile=():boolean=>{
+  if(window.navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)) {
+    return true; // 移动端
+  }else{
+    return false; // PC端
+  }
+}
 const proj = ref([
   {
     name:'东软睿购商城',
@@ -1066,6 +1064,13 @@ onMounted(()=>{
 window.onload=function (){
   let element = document.querySelector('.loading_mask') as HTMLElement
   element.style.display = "none"
+  if (!isMobile()){
+    let point = document.querySelector('#pointer') as HTMLElement
+    let point2 = document.querySelector('#pointer2') as HTMLElement
+    point.style.display = "flex"
+    point2.style.display = "flex"
+  }
+
 }
 
 </script>
