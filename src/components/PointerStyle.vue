@@ -35,8 +35,8 @@
 }
 #pointer{
   position: absolute;
-  left: -3px;
-  top: -3px;
+  left: -13px;
+  top: -13px;
   width: 6px;
   display: none;
   height: 6px;
@@ -48,8 +48,8 @@
 }
 #pointer2{
   position: absolute;
-  left: -10px;
-  top: -10px;
+  left: -20px;
+  top: -20px;
   width: 20px;
   height: 20px;
   display: none;

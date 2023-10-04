@@ -103,8 +103,8 @@ const changeScrollRolling=(webPageHeight:number, innerHeight:number, scrollTop:n
   element.style.width=scrollWidth;
 }
 const changeStyle=()=>{
-  let element1 = document.querySelector("#app") as HTMLElement;
-  element1.className=element1.className=="day"?"dark":"day";
+  let element1 = document.querySelector(".app") as HTMLElement;
+  element1.className=element1.className=="app day"?"app dark":"app day";
 }
 </script>
 

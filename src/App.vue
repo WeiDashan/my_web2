@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="day"
+  <div id="app" class="app day"
     @mousewheel="listenScrollRolling"
     @mousemove="listenMouseMove"
     @mousedown="listenMouseDown"
