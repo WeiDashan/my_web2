@@ -833,11 +833,7 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue"
 const isMobile=():boolean=>{
-  if(window.navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)) {
-    return true; // 移动端
-  }else{
-    return false; // PC端
-  }
+  return !!window.navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
 }
 const proj = ref([
   {
@@ -866,8 +862,8 @@ const listenShowMenu = ()=>{
     const options={
       threshold: 0,
     };
-    const listenShowMenuCall=(entries:any)=>{
-      entries.forEach((entry:any)=>{
+    const listenShowMenuCall=(entries:IntersectionObserverEntry[])=>{
+      entries.forEach((entry:IntersectionObserverEntry)=>{
         const element = document.querySelector('.menu') as HTMLElement;
         const element2 = document.querySelector('.menu2') as HTMLElement;
         if (entry.isIntersecting){
@@ -887,8 +883,8 @@ const listenShowTools = ()=>{
     const options = {
     threshold: 1
   }
-    const showToolsCall = (entries: any)=>{
-      entries.forEach((entry: any)=>{
+    const showToolsCall = (entries: IntersectionObserverEntry[])=>{
+      entries.forEach((entry: IntersectionObserverEntry)=>{
         let element = document.querySelector('.tools') as HTMLElement;
         if (entry.isIntersecting && entry.intersectionRatio>0.01 ){
           element.style.display='none';
@@ -901,7 +897,7 @@ const listenShowTools = ()=>{
     const section = document.querySelector("#showTools") as HTMLElement;
     observer.observe(section);
   }
-const listenMouseMove = (e:any)=>{
+const listenMouseMove = (e:MouseEvent)=>{
     const pointer = document.getElementById("pointer");
     const pointer2 = document.getElementById("pointer2");
     const body = document.querySelector("body");
@@ -914,7 +910,7 @@ const listenMouseMove = (e:any)=>{
       })
     }
   }
-const listenScrollRolling=(e:any)=>{
+const listenScrollRolling=(e: WheelEvent)=>{
   let webPageHeight:number = document.body.clientHeight;
   let innerHeight:number = document.documentElement.clientHeight;
   let scrollTop:number = document.documentElement.scrollTop+e.deltaY;
@@ -937,11 +933,12 @@ const lazyLoading = () =>{
   const options = {
     threshold: 0
   }
-  const listenTarget=(entries:any)=>{
-    entries.forEach((entry:any)=>{
+  const listenTarget=(entries:IntersectionObserverEntry[])=>{
+    entries.forEach((entry:IntersectionObserverEntry)=>{
       if (entry.isIntersecting){
         // console.log(entry.target.getAttribute("data-src"))
-        entry.target.setAttribute('src',entry.target.getAttribute("data-src"))
+        let data_src = entry.target.getAttribute("data-src") as string
+        entry.target.setAttribute('src',data_src)
         observer.unobserve(entry.target)
       }
     })
