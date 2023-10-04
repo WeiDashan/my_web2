@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <LoadingPage  :flag=loadingFlag />
     <div class="background">
       <img alt="" src="../assets/background_img_light.png">
     </div>
@@ -316,6 +317,7 @@
 <script setup lang="ts">
 
 import {onMounted, ref} from "vue"
+import LoadingPage from "@/components/LoadingPage.vue";
 const proj = ref([
   {
     name:'东软睿购商城',
