@@ -2,16 +2,20 @@
   <div class="home">
     <LoadingPage  :flag=loadingFlag />
     <div class="background">
-      <img class="backgroundImg" alt="" src="../assets/background_img_light.png">
-      <img class="backgroundDown" @click="clickBackgroundDown" alt="" src="../assets/down_dbdbdb.png">
+      <img class="backgroundImg" alt="" src="../assets/img/background_img_light.png">
+      <img class="backgroundDown" @click="clickBackgroundDown" alt="" src="../assets/img/down_dbdbdb.png">
+      <!--  canvas初始默认width=300,height=150  -->
+      <!--  canvasWidth = background.clientWidth * window.devicePixelRatio  -->
+      <!--  canvasHeight = background.clientHeight * window.devicePixelRatio  -->
+      <canvas id="backgroundBubbleCan"></canvas>
     </div>
     <div class="menu">
-        <img alt="" class="menu_off" src="../assets/menu_ffffff.png">
-        <img alt="" class="menu_on" src="../assets/menu_dbdbdb.png">
+        <img alt="" class="menu_off" src="../assets/img/menu_ffffff.png">
+        <img alt="" class="menu_on" src="../assets/img/menu_dbdbdb.png">
         <span>MENU</span>
       </div>
     <div class="menu2">
-        <img alt="" src="../assets/menu_ffffff.png">
+        <img alt="" src="../assets/img/menu_ffffff.png">
       </div>
     <div class="body">
       <div class="projectItem" v-for="item in proj" :key="item">
@@ -67,6 +71,15 @@
       height: 40px;
       z-index: 2;
       animation: backgroundDown 4s linear infinite;
+    }
+    #backgroundBubbleCan{
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: transparent;
     }
   }
   .menu2{
@@ -233,6 +246,9 @@
     .backgroundDown{
       display: none;
     }
+    .backgroundBubbleCan{
+      display: none;
+    }
   }
   .projectItem{
     flex-direction: column;
@@ -257,6 +273,9 @@
       object-fit: cover;
     }
     .backgroundDown{
+      display: none;
+    }
+    .backgroundBubbleCan{
       display: none;
     }
   }
@@ -288,6 +307,9 @@
       object-fit: cover;
     }
     .backgroundDown{
+      display: none;
+    }
+    .backgroundBubbleCan{
       display: none;
     }
   }
@@ -324,6 +346,9 @@
       object-fit: cover;
     }
     .backgroundDown{
+      display: flex;
+    }
+    .backgroundBubbleCan{
       display: flex;
     }
   }
@@ -369,32 +394,35 @@
 }
 </style>
 <script setup lang="ts">
-
 import {onMounted, ref} from "vue"
-import LoadingPage from "@/components/LoadingPage.vue";
+import LoadingPage from "@/components/LoadingPage.vue"
 const proj = ref([
   {
     name:'东软睿购商城',
     desc:'该系统是一款移动端微服务电商应用，包括用户、订单、商品、购物车等全方位多模块设计，为了反馈用户的账号操作，利用RabbitMQ实现邮件通知；为了缓存验证码，增加了SSDB；为了提升搜索效果，增加了ElasticSearch。',
-    img: require('../assets/neusoft.jpg'),
+    img: require('../assets/img/neusoft.jpg'),
   },
   {
     name:'HIS东软云医院信息系统',
     desc:'本系统包括登录、挂号、问诊、开药、发药、缴费共六个模块设计，聚焦于患者诊疗全过程，规范医院诊疗流程，辅助医院信息化建设。',
-    img: require('../assets/neu_hospital.jpg'),
+    img: require('../assets/img/neu_hospital.jpg'),
   },
   {
     name:'东软睿购商城',
     desc:'该系统是一款移动端微服务电商应用，包括用户、订单、商品、购物车等全方位多模块设计，为了反馈用户的账号操作，利用RabbitMQ实现邮件通知；为了缓存验证码，增加了SSDB；为了提升搜索效果，增加了ElasticSearch。',
-    img: require('../assets/neusoft.jpg'),
+    img: require('../assets/img/neusoft.jpg'),
   },
   {
     name:'HIS东软云医院信息系统',
     desc:'本系统包括登录、挂号、问诊、开药、发药、缴费共六个模块设计，聚焦于患者诊疗全过程，规范医院诊疗流程，辅助医院信息化建设。',
-    img: require('../assets/neu_hospital.jpg'),
+    img: require('../assets/img/neu_hospital.jpg'),
   },
 ])
 const loadingFlag = ref(true)
+let canvasWidth: number
+let canvasHeight: number
+let bubbleNum = 120
+let bubbleList: Bubble[] = []
 const changeScrollRolling=(pageHeight:number, innerHeight:number, scrollTop:number)=>{
   let totalDistance = Math.max(pageHeight - innerHeight);
   if (totalDistance>0){
@@ -480,12 +508,84 @@ const lazyLoading = () =>{
     observer.observe(section)
   })
 }
+class Bubble{
+  x: number
+  y: number
+  radius: number
+  speed: number
+  minY: number
+  constructor() {
+    this.x = Math.random()*canvasWidth                  // 气泡的x坐标
+    this.radius = 3+Math.random()*6                     // 气泡半径 3~9
+    this.minY = this.initMinY()                         // 气泡上升的最高位置
+    this.speed = this.initSpeed()                       // 气泡上升的速度
+    this.y = canvasHeight+this.radius                   // 气泡的y坐标
+  }
+  initMinY():number{
+    if (this.radius>4){
+      return canvasHeight*0.55+Math.random()*canvasHeight*0.4
+    }else {
+      return 40+Math.random()*canvasHeight*0.9
+    }
+  }
+  initSpeed():number{
+    return Math.random()*0.5+1-(canvasHeight-this.minY)/canvasHeight
+  }
+  init(){
+    this.x = Math.random()*canvasWidth
+    this.radius = 3+Math.random()*6
+    this.minY = this.initMinY()
+    this.speed = this.initSpeed()
+    this.y = canvasHeight+this.radius
+  }
+  draw(ctx: CanvasRenderingContext2D){
+    ctx.beginPath()
+    if (this.y>this.minY){
+      this.y = Math.max(this.y-this.speed,this.minY)
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2)
+      ctx.fillStyle="rgba(220,220,220,0.3)";//设置填充颜色
+      ctx.fill();//开始填充
+    }else {
+      this.init()
+    }
+  }
+}
+const resetCanvasWidthAndHeight=()=>{
+  let canvas = document.querySelector("#backgroundBubbleCan") as HTMLCanvasElement
+  let background = document.querySelector(".background") as HTMLElement
+  canvasWidth  = background.clientWidth * window.devicePixelRatio
+  canvasHeight = background.clientHeight * window.devicePixelRatio
+  canvas.width = canvasWidth
+  canvas.height = canvasHeight
+}
+
+const bubbleMoving=()=>{
+  let canvas = document.querySelector("#backgroundBubbleCan") as HTMLCanvasElement
+  let ctx = canvas.getContext("2d") as CanvasRenderingContext2D
+  for (let i=0;i<bubbleNum;i++){
+    bubbleList.push(new Bubble())
+  }
+  const bubbleMoveStep=()=>{
+    ctx.clearRect(0,0,canvasWidth,canvasHeight)
+    for (let i=0;i<bubbleNum;i++){
+      bubbleList[i].draw(ctx)
+    }
+    requestAnimationFrame(bubbleMoveStep)
+  }
+  requestAnimationFrame(bubbleMoveStep)
+}
+
 onMounted(()=>{
   listenShowMenu()
   listenShowTools()
   lazyLoading()
 })
 window.onload=function (){
+  resetCanvasWidthAndHeight()
+  bubbleMoving()
   loadingFlag.value = false
+}
+window.onresize=()=>{
+  resetCanvasWidthAndHeight()
 }
 </script>

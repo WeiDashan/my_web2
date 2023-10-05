@@ -1,94 +1,109 @@
 <template>
-  <div class="pointerStyle"
-       @mousemove="listenMouseMove"
-       @mousedown="listenMouseDown"
-       @mouseup="listenMouseUp">
-    <div id="pointer" class="border1"></div>
-    <div id="pointer2"></div>
+  <div class="background">
+<!--  canvas初始默认width=300,height=150  -->
+<!--  canvasWidth = background.clientWidth * window.devicePixelRatio  -->
+<!--  canvasHeight = background.clientHeight * window.devicePixelRatio  -->
+    <canvas id="backgroundBubbleCan"></canvas>
   </div>
 </template>
 
 <script setup lang="ts">
-const listenMouseMove = (e:MouseEvent)=>{
-  const pointer = document.getElementById("pointer");
-  const pointer2 = document.getElementById("pointer2");
-  const body = document.querySelector("body");
-  if (body&&pointer&&pointer2){
-    window.requestAnimationFrame(()=>{
-      pointer.style.left = e.pageX-3+"px";
-      pointer.style.top = e.pageY-3+"px";
-      pointer2.style.left = e.pageX-11+"px";
-      pointer2.style.top = e.pageY-11+"px";
-    })
+let canvasWidth: number
+let canvasHeight: number
+let bubbleList: Bubble[] = []
+class Bubble{
+  x: number
+  y: number
+  radius: number
+  speed: number
+  minY: number
+  constructor() {
+    this.x = Math.random()*canvasWidth                  // 气泡的x坐标
+    this.radius = 3+Math.random()*6                     // 气泡半径 3~9
+    this.minY = this.initMinY()                         // 气泡上升的最高位置
+    this.speed = this.initSpeed()                       // 气泡上升的速度
+    this.y = canvasHeight+this.radius                   // 气泡的y坐标
+  }
+  initMinY():number{
+    if (this.radius>4){
+      return canvasHeight*0.6+Math.random()*canvasHeight*0.3
+    }else {
+      return 40+Math.random()*canvasHeight*0.9
+    }
+  }
+  initSpeed():number{
+    return Math.random()+1-(canvasHeight-this.minY)/canvasHeight
+  }
+  init(){
+    this.x = Math.random()*canvasWidth
+    this.radius = 3+Math.random()*6
+    this.minY = this.initMinY()
+    this.speed = this.initSpeed()
+    this.y = canvasHeight+this.radius
+  }
+  draw(ctx: CanvasRenderingContext2D){
+    ctx.beginPath()
+    if (this.y>this.minY){
+      this.y = Math.max(this.y-this.speed,this.minY)
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2)
+      ctx.fillStyle="rgba(220,220,220,0.5)";//设置填充颜色
+      ctx.fill();//开始填充
+    }else {
+      this.init()
+    }
   }
 }
-const isMobile=():boolean=>{
-  return !!window.navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+const resetCanvasWidthAndHeight=()=>{
+  let canvas = document.querySelector("#backgroundBubbleCan") as HTMLCanvasElement
+  let background = document.querySelector(".background") as HTMLElement
+  canvasWidth  = background.clientWidth * window.devicePixelRatio
+  canvasHeight = background.clientHeight * window.devicePixelRatio
+  canvas.width = canvasWidth
+  canvas.height = canvasHeight
 }
-const mouseUpAndDown=(pointerLength:string, pointer2borderLength:string)=>{
-  let pointerElement = document.querySelector("#pointer") as HTMLElement;
-  let pointerElement2 = document.querySelector("#pointer2") as HTMLElement;
-  pointerElement.style.height = pointerLength;
-  pointerElement.style.width = pointerLength;
-  pointerElement2.style.height = pointer2borderLength;
-  pointerElement2.style.width = pointer2borderLength;
-  if (pointerLength.length>pointer2borderLength.length){
-    //mouseDown
-    pointerElement.style.transform= "translate(-7px,-7px)";
-    pointerElement2.style.transform= "translate(7px,7px)";
-  }else {
-    //mouseUp
-    pointerElement.style.transform= "";
-    pointerElement2.style.transform= "";
+
+const bubbleMoving=()=>{
+  let canvas = document.querySelector("#backgroundBubbleCan") as HTMLCanvasElement
+  let ctx = canvas.getContext("2d") as CanvasRenderingContext2D
+
+  let bubbleNum = 90
+  for (let i=0;i<bubbleNum;i++){
+    bubbleList.push(new Bubble())
   }
-}
-const listenMouseDown=()=>{
-  mouseUpAndDown("20px","6px");
-}
-const listenMouseUp=()=>{
-  mouseUpAndDown("6px","20px");
-}
-window.onload=function (){
-  if (!isMobile()){
-    let point = document.querySelector('#pointer') as HTMLElement
-    let point2 = document.querySelector('#pointer2') as HTMLElement
-    point.style.display = "flex"
-    point2.style.display = "flex"
+
+  const bubbleMoveStep=()=>{
+    ctx.clearRect(0,0,canvasWidth,canvasHeight)
+    for (let i=0;i<bubbleNum;i++){
+      bubbleList[i].draw(ctx)
+    }
+    requestAnimationFrame(bubbleMoveStep)
   }
+  requestAnimationFrame(bubbleMoveStep)
+}
+window.onload=()=>{
+  resetCanvasWidthAndHeight()
+  bubbleMoving()
+}
+window.onresize=()=>{
+  resetCanvasWidthAndHeight()
 }
 </script>
 
 <style scoped lang="less">
-  .pointerStyle{
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0);
-    #pointer{
+  .background{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    //background: pink;
+    #backgroundBubbleCan{
       position: absolute;
-      left: -13px;
-      top: -13px;
-      width: 6px;
-      display: none;
-      height: 6px;
-      border-radius: 50%;
-      background-color: var(--theme-pointer_background);
-      z-index: 3;
-      pointer-events: none;
-      transition: 50ms;
-    }
-    #pointer2{
-      position: absolute;
-      left: -20px;
-      top: -20px;
-      width: 20px;
-      height: 20px;
-      display: none;
-      border-radius: 5px;
-      border: 1px var(--theme-pointer_border_color) solid;
-      background-color: rgba(0,0,0,0);
-      transition: .1s ease-out;
-      z-index: 2;
-      pointer-events: none;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: green;
     }
   }
 </style>

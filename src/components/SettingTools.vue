@@ -1,25 +1,25 @@
 <template>
   <div class="tools">
     <div class="tools_item" @click="toTop">
-      <img alt="" src="../assets/top_dbdbdb.png">
-      <img alt="" src="../assets/top_8a8a8a.png">
-      <img alt="" src="../assets/top_515151.png">
+      <img alt="" src="../assets/img/top_dbdbdb.png">
+      <img alt="" src="../assets/img/top_8a8a8a.png">
+      <img alt="" src="../assets/img/top_515151.png">
     </div>
     <div class="tools_item" @click="clickSetting">
-      <img alt="" src="../assets/setting_dbdbdb.png">
-      <img alt="" src="../assets/setting_8a8a8a.png">
-      <img alt="" src="../assets/setting_515151.png">
+      <img alt="" src="../assets/img/setting_dbdbdb.png">
+      <img alt="" src="../assets/img/setting_8a8a8a.png">
+      <img alt="" src="../assets/img/setting_515151.png">
     </div>
     <div class="tools_item toBelow" @click="toBelow">
-      <img alt="" src="../assets/top_dbdbdb.png">
-      <img alt="" src="../assets/top_8a8a8a.png">
-      <img alt="" src="../assets/top_515151.png">
+      <img alt="" src="../assets/img/top_dbdbdb.png">
+      <img alt="" src="../assets/img/top_8a8a8a.png">
+      <img alt="" src="../assets/img/top_515151.png">
     </div>
     <div class="tools_item changeStyle" @click="changeStyle">
-      <img alt="" src="../assets/sun_8a8a8a.png">
-      <img alt="" src="../assets/sun_515151.png">
-      <img alt="" src="../assets/moon_dbdbdb.png">
-      <img alt="" src="../assets/moon_8a8a8a.png">
+      <img alt="" src="../assets/img/sun_8a8a8a.png">
+      <img alt="" src="../assets/img/sun_515151.png">
+      <img alt="" src="../assets/img/moon_dbdbdb.png">
+      <img alt="" src="../assets/img/moon_8a8a8a.png">
     </div>
   </div>
 </template>
