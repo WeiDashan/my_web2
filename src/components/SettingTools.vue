@@ -94,13 +94,13 @@ const toBelow=()=>{
   //   changeScrollRolling(webBodyLength, screenVisualLength, scrollTop);
   // },10)
 }
-const changeScrollRolling=(webPageHeight:number, innerHeight:number, scrollTop:number)=>{
-  let startPosition:number   = innerHeight / 2;
-  let endPosition:number     = webPageHeight - innerHeight / 2;
-  let currentPosition:number = scrollTop + innerHeight / 2;
-  let scrollWidth:string = ((currentPosition-startPosition)*100/(endPosition-startPosition)).toFixed(2)+"%";
-  let element = document.querySelector(".screen_progress_bar") as HTMLElement;
-  element.style.width=scrollWidth;
+const changeScrollRolling=(pageHeight:number, innerHeight:number, scrollTop:number)=>{
+  let totalDistance = Math.max(pageHeight - innerHeight);
+  if (totalDistance>0){
+    let scrollWidth:string = (scrollTop*100/totalDistance).toFixed(2)+"%";
+    let element = document.querySelector(".screen_progress_bar") as HTMLElement;
+    element.style.width=scrollWidth;
+  }
 }
 const changeStyle=()=>{
   let element1 = document.querySelector(".app") as HTMLElement;

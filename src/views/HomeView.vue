@@ -2,7 +2,8 @@
   <div class="home">
     <LoadingPage  :flag=loadingFlag />
     <div class="background">
-      <img alt="" src="../assets/background_img_light.png">
+      <img class="backgroundImg" alt="" src="../assets/background_img_light.png">
+      <img class="backgroundDown" @click="clickBackgroundDown" alt="" src="../assets/down_dbdbdb.png">
     </div>
     <div class="menu">
         <img alt="" class="menu_off" src="../assets/menu_ffffff.png">
@@ -50,12 +51,22 @@
 .home{
   width: 100%;
   .background{
+    position: relative;
     margin: 0;
     padding: 0;
     width: 100%;
     overflow: hidden;
-    img{
+    .backgroundImg{
       display: block;
+    }
+    .backgroundDown{
+      position: absolute;
+      left: 50%;
+      bottom: 6%;
+      width: 40px;
+      height: 40px;
+      z-index: 2;
+      animation: backgroundDown 4s linear infinite;
     }
   }
   .menu2{
@@ -175,6 +186,29 @@
     }
   }
 }
+@keyframes backgroundDown {
+  from{
+    transform: translateX(-50%);
+  }
+  50%{
+    transform: translateX(-50%);
+  }
+  60%{
+    transform: translateX(-50%) translateY(-30%);
+  }
+  70%{
+    transform: translateX(-50%);
+  }
+  75%{
+    transform: translateX(-50%) translateY(-10%);
+  }
+  80%{
+    transform: translateX(-50%);
+  }
+  to{
+    transform: translateX(-50%);
+  }
+}
 @keyframes settingRotate {
   0% {
     transform: rotate(0);
@@ -189,11 +223,16 @@
     padding: 0;
     border: none;
   }
-  .background img{
-    height: 226px;
-    width: auto;
-    object-fit: cover;
-    transform: translate(calc(50vw - 50%),0);
+  .background{
+    .backgroundImg{
+      height: 226px;
+      width: auto;
+      object-fit: cover;
+      transform: translate(calc(50vw - 50%),0);
+    }
+    .backgroundDown{
+      display: none;
+    }
   }
   .projectItem{
     flex-direction: column;
@@ -211,10 +250,15 @@
     padding: 0;
     border: none;
   }
-  .background img{
-    width: 100%;
-    height: auto;
-    object-fit: cover;
+  .background{
+    .backgroundImg{
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+    .backgroundDown{
+      display: none;
+    }
   }
   .body{
     padding-left: 0;
@@ -237,10 +281,15 @@
     border: 1px @menuOff solid;
     border-radius: 4px;
   }
-  .background img{
-    width: 100%;
-    height: auto;
-    object-fit: cover;
+  .background{
+    .backgroundImg{
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+    .backgroundDown{
+      display: none;
+    }
   }
   .body{
     padding-left: 0;
@@ -268,10 +317,15 @@
     border: 1px @menuOff solid;
     border-radius: 4px;
   }
-  .background img{
-    width: 100%;
-    height: 100vh;
-    object-fit: cover;
+  .background{
+    .backgroundImg{
+      width: 100%;
+      height: 100vh;
+      object-fit: cover;
+    }
+    .backgroundDown{
+      display: flex;
+    }
   }
   .body{
     padding-left: 10%;
@@ -341,6 +395,32 @@ const proj = ref([
   },
 ])
 const loadingFlag = ref(true)
+const changeScrollRolling=(pageHeight:number, innerHeight:number, scrollTop:number)=>{
+  let totalDistance = Math.max(pageHeight - innerHeight);
+  if (totalDistance>0){
+    let scrollWidth:string = (scrollTop*100/totalDistance).toFixed(2)+"%";
+    let element = document.querySelector(".screen_progress_bar") as HTMLElement;
+    element.style.width=scrollWidth;
+  }
+}
+const clickBackgroundDown = ()=>{
+  let downSpeed = 10
+  let element = document.querySelector(".background") as HTMLElement;
+  let moveDistance = element.clientHeight
+  let scrollTop = document.documentElement.scrollTop
+  let rafId: number
+  let moveDown = ()=>{
+    scrollTop = Math.min(scrollTop+downSpeed, moveDistance)
+    document.documentElement.scrollTop = scrollTop
+    changeScrollRolling(document.body.clientHeight, document.documentElement.clientHeight, scrollTop)
+    if (scrollTop<moveDistance){
+      rafId = requestAnimationFrame(moveDown)
+    }else {
+      cancelAnimationFrame(rafId)
+    }
+  }
+  rafId = requestAnimationFrame(moveDown)
+}
 const listenShowMenu = ()=>{
     const options={
       threshold: 0,

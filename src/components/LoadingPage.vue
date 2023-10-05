@@ -31,7 +31,6 @@ const myProps = defineProps({
 
 onMounted(()=>{
   const timer = setInterval(()=>{
-    console.log(myProps.flag)
     if (!myProps.flag){
       let element = document.querySelector('.loading_mask') as HTMLElement
       element.style.display = 'none'
