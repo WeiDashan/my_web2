@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import streamers from "@/assets/ts/streamers";
+import streamers from "@/assets/ts/streamers"
 streamers({
   body: '.body',
   position : "fixed",
@@ -28,7 +28,6 @@ streamers({
   stInitWidth: 90,
   ctxGlobalAlpha: 0.6,
 })
-
 </script>
 
 <style scoped lang="less">

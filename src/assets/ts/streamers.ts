@@ -267,8 +267,6 @@ const resetCanvasWidthAndHeight=()=>{
     stBody = document.querySelector(".body") as HTMLElement
     stCanvasWidth   = stBody.clientWidth * window.devicePixelRatio
     stCanvasHeight  = stBody.clientHeight * window.devicePixelRatio
-    stCanvas.width  = stCanvasWidth
-    stCanvas.height = stCanvasHeight
 }
 
 export default streamers
