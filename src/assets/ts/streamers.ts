@@ -1,19 +1,29 @@
-function streamers(streamersOptions:any){
-    window.onresize=()=>{
-        resetCanvasWidthAndHeight()
-    }
-    window.onload=()=>{
-        for (const key in streamersOptions){
-            if (key in stOptions){
-                stOptions[key] = streamersOptions[key]
-            }
+import {Ref} from "vue/dist/vue";
+import {watch} from "vue";
+function streamers(streamersOptions:any,runStreamersOrNot:Ref<true|false>){
+    window.addEventListener('resize',resetCanvasWidthAndHeight)
+    for (const key in streamersOptions){
+        if (key in stOptions){
+            stOptions[key] = streamersOptions[key]
         }
-        resetCanvasWidthAndHeight()
-        createCanvas()
-        init()
-        runStreamer()
     }
+    window.addEventListener('load',runStreamer)
+    watch(runStreamersOrNot,()=>{
+        if (runStreamersOrNot.value){
+            console.log('加载')
+            resetCanvasWidthAndHeight()
+            runStreamer()
+            window.addEventListener('resize',resetCanvasWidthAndHeight)
+            window.addEventListener('load',runStreamer)
+        }else {
+            console.log('不加载')
+            window.removeEventListener('resize',resetCanvasWidthAndHeight)
+            window.removeEventListener('load',runStreamer)
+            cancelAnimationFrame(runStreamerAniConfig)
+        }
+    })
 }
+
 let stBody: HTMLElement
 let stCanvasWidth: number
 let stCanvasHeight: number
@@ -22,18 +32,19 @@ let stCtx:CanvasRenderingContext2D
 let streamersList: STPoint[][]
 let streamersColor: STColorUnit[][]
 let currentHues: number[]
+let runStreamerAniConfig:number
 
 const stOptions:any={
-    body: '.body',
-    position : "fixed",
+    idName: 'stCanvas',
+    body: '.projectBody',
+    position : "absolute",
     top : "0",
     left : "0",
     width : "100%",
     height : "100%",
-    zIndex : "-1",
+    zIndex : "0",
     pointerEvents : "none",
     opacity : "0.8",
-    xSpeed : 150,
     streamersNum: 3,
     // hsla(hue, saturation, lightness, alpha)
     // hue定义色轮上的度数0-360，0为红色，120为绿色，240为蓝色
@@ -45,8 +56,10 @@ const stOptions:any={
     streamerColorAlphaSpeed: 0.01,
     streamerColorAlphaMidValue: 0.1,
     streamerColorHueSpeed: 1,
-    stInitWidth: 90,
+    stInitWidth: 40,
     ctxGlobalAlpha: 0.6,
+    xSpeed: 150,
+    ySpeed: 100,
 }
 class STPoint{
     x:number
@@ -98,13 +111,13 @@ class STColorUnit{
         }
     }
 }
-const initGenerateStreamer=()       :STPoint[]=>{
+const initGenerateStreamer=(index:number,totalNum:number):STPoint[]=>{
     const getDirection=(x:number)=>{
         return  x==0?'left':'right'
     }
     const stPoints: STPoint[]   = []
     const x         = generateX()
-    const centerY   = generateCenterY()
+    const centerY   = generateCenterY(index,totalNum)
     const direction = getDirection(x)
     stPoints.push(new STPoint(x,centerY+stOptions.stInitWidth, direction))
     stPoints.push(new STPoint(x,centerY-stOptions.stInitWidth, direction))
@@ -125,14 +138,20 @@ const init=()=>{
     currentHues     = []
     for (let i=0; i<stOptions.streamersNum;i++){
         currentHues.push(generateHue())
-        const stPoints: STPoint[]     = initGenerateStreamer()
+        const stPoints: STPoint[]     = initGenerateStreamer(i,stOptions.streamersNum)
         const stColor: STColorUnit[]  = initGenerateColor(i)
         streamersList.push(stPoints)
         streamersColor.push(stColor)
     }
 }
-const generateCenterY=():number=>{
-    return stOptions.stInitWidth+Math.random()*(stCanvasHeight-stOptions.stInitWidth*2)
+const generateCenterY=(index:number,totalNum:number):number=>{
+    const perRange = stCanvasHeight/totalNum
+    const totalLength = perRange - stOptions.stInitWidth*2
+    if (totalLength>0){
+        return perRange*index+stOptions.stInitWidth+Math.random()*totalLength
+    }else {
+        return stOptions.stInitWidth+Math.random()*(stCanvasHeight-stOptions.stInitWidth*2)
+    }
 }
 const generateX=():number=>{
     return Math.random()>0.5?0:stCanvasWidth
@@ -140,14 +159,32 @@ const generateX=():number=>{
 // 根据上一点生成下一个点
 const generateNewPoint=(lastSTPoint: STPoint): STPoint=>{
     const moveX=(x: number):number=>{
+        // const moveXRange = stOptions.xChangeTop-stOptions.xChangeBelow
         if (lastSTPoint.direction=="left"){
-            return  x + (Math.random()-0.2)*stOptions.xSpeed
+            // 1
+            // return x + Math.random()*moveXRange + stOptions.xChangeBelow
+            // 2
+            return  x + (Math.random()*1.5-0.3)*stOptions.xSpeed
+            // 3
+            // return x + (Math.random()-0.2)*stOptions.xSpeed
         }else {
-            return  x - (Math.random()-0.2)*stOptions.xSpeed
+            // 1
+            // return x - Math.random()*moveXRange - stOptions.xChangeBelow
+            // 2
+            return  x - (Math.random()*1.5-0.2)*stOptions.xSpeed
+            // 3
+            // return x - (Math.random()*2-0.25)*stOptions.stInitWidth
         }
     }
     const moveY=(y: number):number=>{
-        const nodeY = y + (Math.random() - 0.5) * stCanvasHeight * 0.25
+        // 1
+        // const moveRange = stOptions.yChangeBelow+Math.random()*(stOptions.yChangeTop-stOptions.yChangeBelow)
+        // const moveDir = Math.random()>0.5? 1 : -1
+        // const nodeY = y + moveDir*moveRange
+        // 2
+        // const nodeY = y + (Math.random() - 0.5) * stOptions.ySpeed
+        // 3
+        const nodeY = y + (Math.random()*2 - 1) * stOptions.ySpeed;
         return (nodeY > stCanvasHeight || nodeY < 0) ? moveY(y) : nodeY
     }
     return new STPoint(moveX(lastSTPoint.x),moveY(lastSTPoint.y),lastSTPoint.direction)
@@ -156,7 +193,7 @@ const cannotMove=(point1: STPoint, point2: STPoint):boolean=>{
     return point1.outside() && point2.outside()
 }
 //绘图
-const draw=()=>{
+const drawStep=()=>{
     // 获取填充颜色
     const _getColorByIndex=(i:number,j:number):string=>{
         return "hsla("  + streamersColor[i][j].streamerColorHue + ", "
@@ -168,9 +205,10 @@ const draw=()=>{
     stCtx.clearRect(0, 0, stCanvasWidth, stCanvasHeight)
     // 画图
     for (let i=0;i<stOptions.streamersNum;i++){
+        const dirNum = streamersList[i][0].direction=='right'? 1 : -1
         for (let j=0;j<streamersList[i].length-2;j++){
             stCtx.beginPath()
-            stCtx.moveTo(streamersList[i][j].x, streamersList[i][j].y)
+            stCtx.moveTo(streamersList[i][j].x  , streamersList[i][j].y  )
             stCtx.lineTo(streamersList[i][j+1].x, streamersList[i][j+1].y)
             stCtx.lineTo(streamersList[i][j+2].x, streamersList[i][j+2].y)
             stCtx.closePath()
@@ -213,7 +251,7 @@ const updateSTPoints=()=>{
     for (let i=0;i<stOptions.streamersNum;i++){
         if (streamersList[i].length<3){
             currentHues[i]      = generateHue()
-            streamersList[i]    = initGenerateStreamer()
+            streamersList[i]    = initGenerateStreamer(i,stOptions.streamersNum)
             streamersColor[i]   = initGenerateColor(i)
         }
     }
@@ -234,39 +272,55 @@ const updateSTPoints=()=>{
     }
 }
 
-// 运行逻辑
-const runStreamer = ()=>{
-    draw()
+// 循环渲染
+const draw = ()=>{
+    drawStep()
     updateSTPoints()
-    requestAnimationFrame(runStreamer)
+    runStreamerAniConfig = requestAnimationFrame(draw)
+}
+
+// 运行逻辑draw
+const runStreamer=()=>{
+    createCanvas()
+    init()
+    draw()
 }
 
 // 初始化canvas画布
 const createCanvas=()=>{
-    stBody = document.querySelector(stOptions.body) as HTMLElement
-    stCanvasWidth  = stBody.clientWidth * window.devicePixelRatio
-    stCanvasHeight  = stBody.clientHeight * window.devicePixelRatio
-    stCanvas = document.createElement('canvas')
-    stCtx = stCanvas.getContext('2d') as CanvasRenderingContext2D
-    stCanvas.width                  = stCanvasWidth
-    stCanvas.height                 = stCanvasHeight
-    stCanvas.style.position         = stOptions.position
-    stCanvas.style.top              = stOptions.top
-    stCanvas.style.left             = stOptions.left
-    stCanvas.style.width            = stOptions.width
-    stCanvas.style.height           = stOptions.height
-    stCanvas.style.zIndex           = stOptions.zIndex
-    stCanvas.style.pointerEvents    = stOptions.pointerEvents
-    stCanvas.style.opacity          = stOptions.opacity
-    stCtx.globalAlpha               = stOptions.ctxGlobalAlpha
-    stBody.appendChild(stCanvas)
+    const element = document.querySelector('#'+stOptions.idName)
+    if (element==null){
+        stBody = document.querySelector(stOptions.body) as HTMLElement
+        stCanvasWidth  = stBody.clientWidth * window.devicePixelRatio
+        stCanvasHeight  = stBody.clientHeight * window.devicePixelRatio
+        stCanvas = document.createElement('canvas')
+        stCanvas.id                     = stOptions.idName
+        stCanvas.width                  = stCanvasWidth
+        stCanvas.height                 = stCanvasHeight
+        stCanvas.style.position         = stOptions.position
+        stCanvas.style.top              = stOptions.top
+        stCanvas.style.left             = stOptions.left
+        stCanvas.style.width            = stOptions.width
+        stCanvas.style.height           = stOptions.height
+        stCanvas.style.zIndex           = stOptions.zIndex
+        stCanvas.style.pointerEvents    = stOptions.pointerEvents
+        stCanvas.style.opacity          = stOptions.opacity
+        stCtx = stCanvas.getContext('2d') as CanvasRenderingContext2D
+        stCtx.globalAlpha               = stOptions.ctxGlobalAlpha
+        stBody.appendChild(stCanvas)
+    }
 }
 
 // 修改画布宽度
 const resetCanvasWidthAndHeight=()=>{
-    stBody = document.querySelector(".body") as HTMLElement
-    stCanvasWidth   = stBody.clientWidth * window.devicePixelRatio
-    stCanvasHeight  = stBody.clientHeight * window.devicePixelRatio
+    const element = document.querySelector('#'+stOptions.idName)
+    if (element!=null){
+        stBody = document.querySelector(stOptions.body) as HTMLElement
+        stCanvasWidth   = stBody.clientWidth * window.devicePixelRatio
+        stCanvasHeight  = stBody.clientHeight * window.devicePixelRatio
+        stCanvas.width = stCanvasWidth
+        stCanvas.height = stCanvasHeight
+    }
 }
 
 export default streamers

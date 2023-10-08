@@ -4,12 +4,12 @@ import MyTest from '../views/MyTest.vue'
 import LoadingDemoBottle from '../views/LoadingDemoBottle.vue'
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: '/MyTest',
     name: 'MyTest',
     component: MyTest
   },
   {
-    path: '/home',
+    path: '/',
     name: 'home',
     component: HomeView
   },

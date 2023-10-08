@@ -17,8 +17,9 @@
     <div class="menu2">
         <img alt="" src="../assets/img/menu_ffffff.png">
       </div>
-    <div class="body">
-      <div class="projectItem" v-for="item in proj" :key="item">
+    <div class="projectBody">
+      <div class="projectColumn">
+        <div class="projectItem" v-for="item in proj" :key="item">
           <div class="img">
             <img class="lazyImg" alt="" :data-src="item.img" src="">
           </div>
@@ -31,6 +32,7 @@
             </div>
           </div>
         </div>
+      </div>
     </div>
   </div>
 </template>
@@ -39,6 +41,12 @@
 @menuOff:#ffffff;
 @dayProjectShadowColor: #d0cfcf;
 @darkProjectShadowColor: rgba(0, 0, 0, 0.2);
+@projectColumnZIndex: 1;
+@screenMinSize1: 400px;
+@screenMinSize2: 401px;
+@screenMinSize3: 720px;
+@screenMinSize4: 960px;
+@screenMinSize5: 1200px;
 .day{
   .projectItem:hover{
     transition: all .3s;
@@ -54,6 +62,7 @@
 }
 .home{
   width: 100%;
+  background: var(--theme-body_background);
   .background{
     position: relative;
     margin: 0;
@@ -133,67 +142,67 @@
       display: none;
     }
   }
-  .body{
-    background: var(--theme-body_background);
+  .projectBody{
     color: var(--theme-color);
     padding-top: 20px;
     padding-bottom: 20px;
-    .projectItem{
-      width: 100%;
-      //height: 235px;
-      background: var(--theme-project_item_background);
-      margin-top: 20px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-      overflow: hidden;
-      transition: all .3s;
-      //display: flex;
-      display: flex;
-      opacity: 0.9;
-      //flex-direction: row;
-      .img{
-        //width: 40%;
-        height: 235px;
+    position: relative;
+    .projectColumn{
+      position: relative;
+      top: 0;
+      z-index: @projectColumnZIndex;
+      .projectItem{
+        width: 100%;
+        background: var(--theme-project_item_background);
+        margin-top: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
         overflow: hidden;
-        img{
-          display: block;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: all .6s;
-          //visibility: hidden;
-        }
-      }
-      .proj_info{
-        //width: 60%;
-        height: 235px;
-        padding: 45px 50px 55px;
-        box-sizing: border-box;
+        transition: all .3s;
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        font-weight: lighter;
-        .proj_title{
-          width: 100%;
-          height: 40px;
-          font-size: 1.5rem;
-        }
-        .proj_desc{
-          width: 100%;
-          line-height: 28px;
+        opacity: 0.9;
+        .img{
+          height: 235px;
           overflow: hidden;
-          -webkit-line-clamp:3;
-          text-overflow: ellipsis;
-          display: -webkit-box;
-          -webkit-box-orient: vertical;
+          img{
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all .6s;
+          }
+        }
+        .proj_info{
+          //width: 60%;
+          height: 235px;
+          padding: 45px 50px 55px;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          font-weight: lighter;
+          .proj_title{
+            width: 100%;
+            height: 40px;
+            font-size: 1.5rem;
+          }
+          .proj_desc{
+            width: 100%;
+            line-height: 28px;
+            overflow: hidden;
+            -webkit-line-clamp:3;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+          }
         }
       }
-    }
-    .projectItem:hover {
-      .img{
-        img{
-          transform: scale(1.2);
-          transition: all .6s;
+      .projectItem:hover {
+        .img{
+          img{
+            transform: scale(1.2);
+            transition: all .6s;
+          }
         }
       }
     }
@@ -231,7 +240,7 @@
   }
 }
 //小屏幕：屏幕宽度<=400px
-@media screen and (max-width: 400px) {
+@media screen and (max-width: @screenMinSize1) {
   .menu{
     padding: 0;
     border: none;
@@ -252,16 +261,20 @@
   }
   .projectItem{
     flex-direction: column;
-    .img{
+    .projectColumn {
+      left: 0;
       width: 100%;
-    }
-    .proj_info{
-      width: 100%;
+      .img{
+        width: 100%;
+      }
+      .proj_info{
+        width: 100%;
+      }
     }
   }
 }
 //中小屏幕：400px<屏幕宽度<720px
-@media screen and (min-width: 401px) {
+@media screen and (min-width: @screenMinSize2) {
   .menu{
     padding: 0;
     border: none;
@@ -279,22 +292,25 @@
       display: none;
     }
   }
-  .body{
-    padding-left: 0;
-    padding-right: 0;
-  }
-  .projectItem{
-    flex-direction: column;
-    .img{
+  .projectBody{
+    .projectColumn {
+      left: 0;
       width: 100%;
-    }
-    .proj_info{
-      width: 100%;
+      .projectItem{
+        flex-direction: column;
+        .img{
+          width: 100%;
+        }
+        .proj_info{
+          width: 100%;
+        }
+      }
     }
   }
+
 }
 //大屏幕：720px<=屏幕宽度<960px
-@media screen and (min-width: 720px) {
+@media screen and (min-width: @screenMinSize3) {
   .menu{
     padding: 10px 20px;
     border: 1px @menuOff solid;
@@ -313,27 +329,29 @@
       display: none;
     }
   }
-  .body{
-    padding-left: 0;
-    padding-right: 0;
-    :nth-child(odd){
-      flex-direction: row;
-    }
-    :nth-child(even){
-      flex-direction: row-reverse;
-    }
-    .projectItem{
-      .img{
-        width: 40%;
+  .projectBody{
+    .projectColumn{
+      left: 0;
+      width: 100%;
+      :nth-child(odd){
+        flex-direction: row;
       }
-      .proj_info{
-        width: 60%;
+      :nth-child(even){
+        flex-direction: row-reverse;
+      }
+      .projectItem{
+        .img{
+          width: 40%;
+        }
+        .proj_info{
+          width: 60%;
+        }
       }
     }
   }
 }
 //超大屏幕：屏幕宽度>=960px
-@media screen and (min-width: 960px) {
+@media screen and (min-width: @screenMinSize4) {
   .menu{
     padding: 10px 20px;
     border: 1px @menuOff solid;
@@ -352,50 +370,79 @@
       display: flex;
     }
   }
-  .body{
-    padding-left: 10%;
-    padding-right: 10%;
-    :nth-child(odd){
-      flex-direction: row;
-    }
-    :nth-child(even){
-      flex-direction: row-reverse;
-    }
-    .projectItem{
-      .img{
-        width: 40%;
+  .projectBody{
+    .projectColumn{
+      left: 10%;
+      width: 80%;
+      :nth-child(odd){
+        flex-direction: row;
       }
-      .proj_info{
-        width: 60%;
+      :nth-child(even){
+        flex-direction: row-reverse;
+      }
+      .projectItem{
+        .img{
+          width: 40%;
+        }
+        .proj_info{
+          width: 60%;
+        }
       }
     }
   }
 }
 //最大屏幕：屏幕宽度>=960px
-@media screen and (min-width: 1200px) {
-  .body{
-    padding-left: 20%;
-    padding-right: 20%;
-    :nth-child(odd){
-      flex-direction: row;
-    }
-    :nth-child(even){
-      flex-direction: row-reverse;
-    }
-    .projectItem{
-      .img{
-        width: 40%;
+@media screen and (min-width: @screenMinSize5) {
+  .projectBody{
+    .projectColumn{
+      left: 20%;
+      width: 60%;
+      :nth-child(odd){
+        flex-direction: row;
       }
-      .proj_info{
-        width: 60%;
+      :nth-child(even){
+        flex-direction: row-reverse;
+      }
+      .projectItem{
+        .img{
+          width: 40%;
+        }
+        .proj_info{
+          width: 60%;
+        }
       }
     }
   }
 }
 </style>
 <script setup lang="ts">
-import {onMounted, ref} from "vue"
+import {onMounted, Ref, ref} from "vue"
 import LoadingPage from "@/components/LoadingPage.vue"
+import streamers from "@/assets/ts/streamers"
+let runStreamersOrNot:Ref<true|false> = ref(true)
+streamers({
+  idName: 'stCanvas',
+  body: '.projectBody',
+  position : "absolute",
+  top : "0",
+  left : "0",
+  width : "100%",
+  height : "100%",
+  zIndex : "0",
+  pointerEvents : "none",
+  opacity : "0.6",
+  streamersNum: 3,
+  streamerColorSaturation: "80%",
+  streamerColorLightness: "60%",
+  streamerColorAlphaSpeed: 0.01,
+  streamerColorAlphaMidValue: 0.1,
+  streamerColorHueSpeed: 1,
+  stInitWidth: 25,
+  ctxGlobalAlpha: 0.6,
+  xSpeed: 150,
+  ySpeed: 100,
+},runStreamersOrNot)
+
 const proj = ref([
   {
     name:'东软睿购商城',
@@ -423,6 +470,7 @@ let canvasWidth: number
 let canvasHeight: number
 let bubbleNum = 120
 let bubbleList: Bubble[] = []
+
 const changeScrollRolling=(pageHeight:number, innerHeight:number, scrollTop:number)=>{
   let totalDistance = Math.max(pageHeight - innerHeight);
   if (totalDistance>0){
@@ -580,12 +628,35 @@ onMounted(()=>{
   listenShowTools()
   lazyLoading()
 })
-window.onload=function (){
+
+const homeOnLoad=()=>{
   resetCanvasWidthAndHeight()
   bubbleMoving()
   loadingFlag.value = false
 }
-window.onresize=()=>{
+const homeOnResize=()=>{
   resetCanvasWidthAndHeight()
 }
+window.addEventListener('load',homeOnLoad)
+window.addEventListener('resize',homeOnResize)
+
+// 初始判断是否加载停止加载streamers
+const changeRunStreamerConfig = ()=>{
+  const screenWidth = document.body.clientWidth
+  runStreamersOrNot.value = screenWidth >= 960;
+}
+changeRunStreamerConfig()
+// 当屏幕Width小于@screenMinSize4: 960px时，停止加载streamers
+window.addEventListener('resize',changeRunStreamerConfig)
+
+
+
+// window.onload=function (){
+  // resetCanvasWidthAndHeight()
+  // bubbleMoving()
+  // loadingFlag.value = false
+// }
+// window.onresize=()=>{
+//   resetCanvasWidthAndHeight()
+// }
 </script>
