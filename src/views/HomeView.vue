@@ -4,19 +4,15 @@
     <div class="background">
       <img class="backgroundImg" alt="" src="../assets/img/background_img_light.png">
       <img class="backgroundDown" @click="clickBackgroundDown" alt="" src="../assets/img/down_dbdbdb.png">
-      <!--  canvas初始默认width=300,height=150  -->
-      <!--  canvasWidth = background.clientWidth * window.devicePixelRatio  -->
-      <!--  canvasHeight = background.clientHeight * window.devicePixelRatio  -->
-      <canvas id="backgroundBubbleCan"></canvas>
     </div>
     <div class="menu">
-        <img alt="" class="menu_off" src="../assets/img/menu_ffffff.png">
-        <img alt="" class="menu_on" src="../assets/img/menu_dbdbdb.png">
-        <span>MENU</span>
-      </div>
+      <img alt="" class="menu_off" src="../assets/img/menu_ffffff.png">
+      <img alt="" class="menu_on" src="../assets/img/menu_dbdbdb.png">
+      <span>MENU</span>
+    </div>
     <div class="menu2">
-        <img alt="" src="../assets/img/menu_ffffff.png">
-      </div>
+      <img alt="" src="../assets/img/menu_ffffff.png">
+    </div>
     <div class="projectBody">
       <div class="projectColumn">
         <div class="projectItem" v-for="item in proj" :key="item">
@@ -80,15 +76,6 @@
       height: 40px;
       z-index: 2;
       animation: backgroundDown 4s linear infinite;
-    }
-    #backgroundBubbleCan{
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      background: transparent;
     }
   }
   .menu2{
@@ -419,6 +406,7 @@
 import {onMounted, Ref, ref} from "vue"
 import LoadingPage from "@/components/LoadingPage.vue"
 import streamers from "@/assets/ts/streamers"
+import bubbles from "@/assets/ts/bubbles";
 let runStreamersOrNot:Ref<true|false> = ref(true)
 streamers({
   idName: 'stCanvas',
@@ -442,6 +430,22 @@ streamers({
   xSpeed: 150,
   ySpeed: 100,
 },runStreamersOrNot)
+let runBubblesOrNot:Ref<true|false> = ref(true)
+bubbles({
+  body: '.background',
+  idName: 'bbCanvas',
+  position : "absolute",
+  top : "0",
+  left : "0",
+  width : "100%",
+  height : "100%",
+  zIndex : "1",
+  pointerEvents : "none",
+  opacity : "0.8",
+  bubbleNum: 150,
+  background: 'transparent',
+  bubbleColor: "rgba(220,220,220,0.3)",
+},runBubblesOrNot)
 
 const proj = ref([
   {
@@ -466,11 +470,6 @@ const proj = ref([
   },
 ])
 const loadingFlag = ref(true)
-let canvasWidth: number
-let canvasHeight: number
-let bubbleNum = 120
-let bubbleList: Bubble[] = []
-
 const changeScrollRolling=(pageHeight:number, innerHeight:number, scrollTop:number)=>{
   let totalDistance = Math.max(pageHeight - innerHeight);
   if (totalDistance>0){
@@ -498,26 +497,27 @@ const clickBackgroundDown = ()=>{
   rafId = requestAnimationFrame(moveDown)
 }
 const listenShowMenu = ()=>{
-    const options={
-      threshold: 0,
-    };
-    const listenShowMenuCall=(entries:IntersectionObserverEntry[])=>{
+  const options={
+    threshold: 0.1,
+  }
+  const listenShowMenuCall=(entries:IntersectionObserverEntry[])=>{
       entries.forEach((entry:IntersectionObserverEntry)=>{
         const element = document.querySelector('.menu') as HTMLElement;
         const element2 = document.querySelector('.menu2') as HTMLElement;
-        if (entry.isIntersecting){
+        if (entry.isIntersecting&&entry.intersectionRatio>0.1){
           element.style.display='flex'
           element2.style.display='none'
-        }else{
+        }
+        else{
           element.style.display='none'
           element2.style.display='flex'
         }
       })
     }
-    const observer = new IntersectionObserver(listenShowMenuCall,options);
-    const section = document.querySelector(".background") as HTMLElement;
-    observer.observe(section);
-  }
+  const observer = new IntersectionObserver(listenShowMenuCall,options);
+  const section = document.querySelector(".background") as HTMLElement;
+  observer.observe(section);
+}
 const listenShowTools = ()=>{
     const options = {
     threshold: 1
@@ -556,107 +556,24 @@ const lazyLoading = () =>{
     observer.observe(section)
   })
 }
-class Bubble{
-  x: number
-  y: number
-  radius: number
-  speed: number
-  minY: number
-  constructor() {
-    this.x = Math.random()*canvasWidth                  // 气泡的x坐标
-    this.radius = 3+Math.random()*6                     // 气泡半径 3~9
-    this.minY = this.initMinY()                         // 气泡上升的最高位置
-    this.speed = this.initSpeed()                       // 气泡上升的速度
-    this.y = canvasHeight+this.radius                   // 气泡的y坐标
-  }
-  initMinY():number{
-    if (this.radius>4){
-      return canvasHeight*0.55+Math.random()*canvasHeight*0.4
-    }else {
-      return 40+Math.random()*canvasHeight*0.9
-    }
-  }
-  initSpeed():number{
-    return Math.random()*0.5+1-(canvasHeight-this.minY)/canvasHeight
-  }
-  init(){
-    this.x = Math.random()*canvasWidth
-    this.radius = 3+Math.random()*6
-    this.minY = this.initMinY()
-    this.speed = this.initSpeed()
-    this.y = canvasHeight+this.radius
-  }
-  draw(ctx: CanvasRenderingContext2D){
-    ctx.beginPath()
-    if (this.y>this.minY){
-      this.y = Math.max(this.y-this.speed,this.minY)
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2)
-      ctx.fillStyle="rgba(220,220,220,0.3)";//设置填充颜色
-      ctx.fill();//开始填充
-    }else {
-      this.init()
-    }
-  }
-}
-const resetCanvasWidthAndHeight=()=>{
-  let canvas = document.querySelector("#backgroundBubbleCan") as HTMLCanvasElement
-  let background = document.querySelector(".background") as HTMLElement
-  canvasWidth  = background.clientWidth * window.devicePixelRatio
-  canvasHeight = background.clientHeight * window.devicePixelRatio
-  canvas.width = canvasWidth
-  canvas.height = canvasHeight
-}
-
-const bubbleMoving=()=>{
-  let canvas = document.querySelector("#backgroundBubbleCan") as HTMLCanvasElement
-  let ctx = canvas.getContext("2d") as CanvasRenderingContext2D
-  for (let i=0;i<bubbleNum;i++){
-    bubbleList.push(new Bubble())
-  }
-  const bubbleMoveStep=()=>{
-    ctx.clearRect(0,0,canvasWidth,canvasHeight)
-    for (let i=0;i<bubbleNum;i++){
-      bubbleList[i].draw(ctx)
-    }
-    requestAnimationFrame(bubbleMoveStep)
-  }
-  requestAnimationFrame(bubbleMoveStep)
-}
-
 onMounted(()=>{
   listenShowMenu()
   listenShowTools()
   lazyLoading()
 })
-
 const homeOnLoad=()=>{
-  resetCanvasWidthAndHeight()
-  bubbleMoving()
   loadingFlag.value = false
 }
-const homeOnResize=()=>{
-  resetCanvasWidthAndHeight()
-}
 window.addEventListener('load',homeOnLoad)
-window.addEventListener('resize',homeOnResize)
 
-// 初始判断是否加载停止加载streamers
-const changeRunStreamerConfig = ()=>{
+// 初始判断是否加载canvas特效
+const changeRunCanvasConfig = ()=>{
   const screenWidth = document.body.clientWidth
-  runStreamersOrNot.value = screenWidth >= 960;
+  runStreamersOrNot.value = screenWidth >= 960
+  runBubblesOrNot.value = screenWidth >= 960
 }
-changeRunStreamerConfig()
+changeRunCanvasConfig()
 // 当屏幕Width小于@screenMinSize4: 960px时，停止加载streamers
-window.addEventListener('resize',changeRunStreamerConfig)
+window.addEventListener('resize',changeRunCanvasConfig)
 
-
-
-// window.onload=function (){
-  // resetCanvasWidthAndHeight()
-  // bubbleMoving()
-  // loadingFlag.value = false
-// }
-// window.onresize=()=>{
-//   resetCanvasWidthAndHeight()
-// }
 </script>

@@ -1,22 +1,45 @@
 import {Ref} from "vue/dist/vue";
 import {watch} from "vue";
-function streamers(streamersOptions:any,runStreamersOrNot:Ref<true|false>){
+const streamers=(streamersOptions:{
+    idName?: string,
+    body?: string,
+    position?: string,
+    top?: string,
+    left?: string,
+    width?: string,
+    height?: string,
+    zIndex?: string,
+    pointerEvents?: string,
+    opacity?: string,
+    streamersNum?: number,
+    streamerColorSaturation?: string,
+    streamerColorLightness?: string,
+    streamerColorAlphaSpeed?: number,
+    streamerColorAlphaMidValue?: number,
+    streamerColorHueSpeed?: number,
+    stInitWidth?: number,
+    ctxGlobalAlpha?: number,
+    xSpeed?: number,
+    ySpeed?: number,
+},runStreamersOrNot:Ref<true|false>)=>{
     window.addEventListener('resize',resetCanvasWidthAndHeight)
     for (const key in streamersOptions){
         if (key in stOptions){
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             stOptions[key] = streamersOptions[key]
         }
     }
     window.addEventListener('load',runStreamer)
     watch(runStreamersOrNot,()=>{
         if (runStreamersOrNot.value){
-            console.log('加载')
+            // console.log('加载')
             resetCanvasWidthAndHeight()
             runStreamer()
             window.addEventListener('resize',resetCanvasWidthAndHeight)
             window.addEventListener('load',runStreamer)
         }else {
-            console.log('不加载')
+            // console.log('不加载')
             window.removeEventListener('resize',resetCanvasWidthAndHeight)
             window.removeEventListener('load',runStreamer)
             cancelAnimationFrame(runStreamerAniConfig)
@@ -34,7 +57,28 @@ let streamersColor: STColorUnit[][]
 let currentHues: number[]
 let runStreamerAniConfig:number
 
-const stOptions:any={
+const stOptions: {
+    idName: string,
+    body: string,
+    position : string,
+    top : string,
+    left : string,
+    width : string,
+    height : string,
+    zIndex : string,
+    pointerEvents : string,
+    opacity : string,
+    streamersNum: number,
+    streamerColorSaturation: string,
+    streamerColorLightness: string,
+    streamerColorAlphaSpeed: number,
+    streamerColorAlphaMidValue: number,
+    streamerColorHueSpeed: number,
+    stInitWidth: number,
+    ctxGlobalAlpha: number,
+    xSpeed: number,
+    ySpeed: number,
+}={
     idName: 'stCanvas',
     body: '.projectBody',
     position : "absolute",
@@ -205,7 +249,6 @@ const drawStep=()=>{
     stCtx.clearRect(0, 0, stCanvasWidth, stCanvasHeight)
     // 画图
     for (let i=0;i<stOptions.streamersNum;i++){
-        const dirNum = streamersList[i][0].direction=='right'? 1 : -1
         for (let j=0;j<streamersList[i].length-2;j++){
             stCtx.beginPath()
             stCtx.moveTo(streamersList[i][j].x  , streamersList[i][j].y  )
