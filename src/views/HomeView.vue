@@ -15,7 +15,7 @@
     </div>
     <div class="projectBody">
       <div class="projectColumn">
-        <div class="projectItem" v-for="item in proj" :key="item">
+        <div class="projectItem" v-for="item in proj" :key="item" @click="goTo(item.url)">
           <div class="img">
             <img class="lazyImg" alt="" :data-src="item.img" src="">
           </div>
@@ -446,29 +446,46 @@ bubbles({
   background: 'transparent',
   bubbleColor: "rgba(220,220,220,0.3)",
 },runBubblesOrNot)
-
+const baseURL = 'http://49.233.51.52:'
 const proj = ref([
   {
-    name:'东软睿购商城',
-    desc:'该系统是一款移动端微服务电商应用，包括用户、订单、商品、购物车等全方位多模块设计，为了反馈用户的账号操作，利用RabbitMQ实现邮件通知；为了缓存验证码，增加了SSDB；为了提升搜索效果，增加了ElasticSearch。',
-    img: require('../assets/img/neusoft.jpg'),
+    name:'东软睿购商城移动端',
+    desc:'该商城是一款微服务电商应用，移动端应用包括用户、订单、商品、购物车等4个模块，利用Minio存储图片',
+    img: require('../assets/img/shopWeb.jpg'),
+    url: null
   },
   {
-    name:'HIS东软云医院信息系统',
+    name:'东软睿购商城PC端后台管理系统',
+    desc:'该商城是一款微服务电商应用，后台管理系统包括用户、角色、资源、品牌、分类、商品等6个模块',
+    img: require('../assets/img/shopBackWeb.jpg'),
+    url: baseURL+"8083"
+  },
+  {
+    name:'东软云医院信息系统',
     desc:'本系统包括登录、挂号、问诊、开药、发药、缴费共六个模块设计，聚焦于患者诊疗全过程，规范医院诊疗流程，辅助医院信息化建设。',
     img: require('../assets/img/neu_hospital.jpg'),
+    url: null
   },
   {
-    name:'东软睿购商城',
-    desc:'该系统是一款移动端微服务电商应用，包括用户、订单、商品、购物车等全方位多模块设计，为了反馈用户的账号操作，利用RabbitMQ实现邮件通知；为了缓存验证码，增加了SSDB；为了提升搜索效果，增加了ElasticSearch。',
+    name:'应急管理系统Demo',
+    desc:'该系统为应对突发事件设计的管理系统，利用EChart完成辽宁省矢量地图',
     img: require('../assets/img/neusoft.jpg'),
+    url: baseURL+"8082"
   },
   {
-    name:'HIS东软云医院信息系统',
-    desc:'本系统包括登录、挂号、问诊、开药、发药、缴费共六个模块设计，聚焦于患者诊疗全过程，规范医院诊疗流程，辅助医院信息化建设。',
-    img: require('../assets/img/neu_hospital.jpg'),
+    name:'电影网站Demo',
+    desc:'该系统为仿照爱奇艺电影网站的一次尝试',
+    img: require('../assets/img/movieWeb.jpg'),
+    url: baseURL+"8081"
   },
 ])
+const goTo = (url:string|null)=>{
+  if (url === null){
+    console.log("还没放到网站上QAQ")
+  }else {
+    window.location.href = url;
+  }
+}
 const loadingFlag = ref(true)
 const changeScrollRolling=(pageHeight:number, innerHeight:number, scrollTop:number)=>{
   let totalDistance = Math.max(pageHeight - innerHeight);
