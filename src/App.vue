@@ -19,6 +19,7 @@
   --theme-project_item_background: rgb(255,255,255,0.9);
   --theme-pointer_background: #222;
   --theme-pointer_border_color: #696969;
+  --theme-webid_color: #969696;
 }
 .day{
   --theme-color: #000;
@@ -26,6 +27,7 @@
   --theme-project_item_background: rgb(255,255,255,0.9);
   --theme-pointer_background: #222;
   --theme-pointer_border_color: #696969;
+  --theme-webid_color: #969696;
 }
 .dark{
   --theme-color: #fff;
@@ -33,6 +35,7 @@
   --theme-project_item_background: rgb(70,70,70,0.1);
   --theme-pointer_background: #fff;
   --theme-pointer_border_color: #fff;
+  --theme-webid_color: #969696;
 }
 *{
   padding: 0;

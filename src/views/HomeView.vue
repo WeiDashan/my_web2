@@ -29,6 +29,9 @@
           </div>
         </div>
       </div>
+      <div class="webID">
+        <a href="https://beian.miit.gov.cn/">辽ICP备2023016322号</a>
+      </div>
     </div>
   </div>
 </template>
@@ -134,6 +137,15 @@
     padding-top: 20px;
     padding-bottom: 20px;
     position: relative;
+    .webID{
+      text-align: center;
+      margin-top: 40px;
+      a{
+        color: var(--theme-webid_color);
+        text-decoration:none;
+        font-size: 14px;
+      }
+    }
     .projectColumn{
       position: relative;
       top: 0;
@@ -449,39 +461,39 @@ bubbles({
 const baseURL = 'http://49.233.51.52:'
 const proj = ref([
   {
-    name:'东软睿购商城移动端',
-    desc:'该商城是一款微服务电商应用，移动端应用包括用户、订单、商品、购物车等4个模块，利用Minio存储图片',
+    name:'东软睿购商城移动端Web',
+    desc:'该商城是包括用户、登录、商品、购物车、订单、秒杀等6个模块，利用MQ实现了邮件验证码登录，利用Redis的lua脚本和MQ实现秒杀，利用MinIO存储图片',
     img: require('../assets/img/shopWeb.jpg'),
-    url: null
+    url: baseURL+"8084"
   },
   {
-    name:'东软睿购商城PC端后台管理系统',
-    desc:'该商城是一款微服务电商应用，后台管理系统包括用户、角色、资源、品牌、分类、商品等6个模块',
+    name:'东软睿购商城PC端管理系统设计',
+    desc:'该管理系统包括用户、角色、资源、品牌、分类、商品、秒杀等7个模块，利用MinIO存储图片',
     img: require('../assets/img/shopBackWeb.jpg'),
     url: baseURL+"8083"
   },
   {
-    name:'东软云医院信息系统',
+    name:'东软云医院信息系统设计',
     desc:'本系统包括登录、挂号、问诊、开药、发药、缴费共六个模块设计，聚焦于患者诊疗全过程，规范医院诊疗流程，辅助医院信息化建设。',
     img: require('../assets/img/neu_hospital.jpg'),
     url: null
   },
   {
-    name:'应急管理系统Demo',
+    name:'应急管理系统设计',
     desc:'该系统为应对突发事件设计的管理系统，利用EChart完成辽宁省矢量地图',
     img: require('../assets/img/neusoft.jpg'),
     url: baseURL+"8082"
   },
   {
-    name:'电影网站Demo',
-    desc:'该系统为仿照爱奇艺电影网站的一次尝试',
+    name:'电影网站设计',
+    desc:'该系统包括首页展示，分类和详情模块',
     img: require('../assets/img/movieWeb.jpg'),
     url: baseURL+"8081"
   },
 ])
 const goTo = (url:string|null)=>{
   if (url === null){
-    console.log("还没放到网站上QAQ")
+    console.log("未部署到网站上QAQ")
   }else {
     window.location.href = url;
   }
